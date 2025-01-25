@@ -1,0 +1,68 @@
+/*
+WARNING: 不要使用格式化代码 (本文件内) / DON'T USE CODE FORMATTER IN THIS FILE
+*/
+
+html {
+    font-size: 25px;
+    overflow: auto; /* 添加此行 */
+}
+
+rt {
+    font-size: 0.6em;
+}
+
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: auto; /* 添加此行 */
+}
+
+a {
+    text-decoration: none;
+}
+
+body {
+    /* 背景图设置 */
+    background: url('{{ bg }}') no-repeat center center fixed;
+    background-size: cover;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.card {
+    background-color: rgba(255, 255, 255, {{ alpha }});
+    border-radius: 30px;
+    padding: 50px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+@media (max-width: 675px) {
+    body {
+        display: unset;
+    }
+}
+
+/* 以下为各种状态的颜色 */
+
+.sleeping {
+    color: gray;
+}
+
+.awake {
+    color: rgb(16, 128, 0);
+}
+
+.error {
+    color: red;
+}
+
+/* 不建议删除上面的 .sleeping .awake .error 三个默认颜色 */
