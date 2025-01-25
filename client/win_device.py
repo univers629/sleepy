@@ -20,7 +20,7 @@ SECRET = 'wyf9test'
 # 设备标识符，唯一 (它也会被包含在 api 返回中, 不要包含敏感数据)
 DEVICE_ID = 'device-1'
 # 前台显示名称
-DEVICE_SHOW_NAME = 'MyDevice1'
+DEVICE_SHOW_NAME = '电脑'
 # 检查间隔，以秒为单位
 CHECK_INTERVAL = 2
 # 是否忽略重复请求，即窗口未改变时不发送请求
