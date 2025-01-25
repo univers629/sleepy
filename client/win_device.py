@@ -32,7 +32,7 @@ SKIPPED_NAMES = ['', '系统托盘溢出窗口。', '新通知', '任务切换',
 # 当窗口标题为其中任意一项时视为未在使用
 NOT_USING_NAMES = ['我们喜欢这张图片，因此我们将它与你共享。']
 # 是否反转窗口标题，以此让应用名显示在最前 (以 ` - ` 分隔)
-REVERSE_APP_NAME = False
+REVERSE_APP_NAME = True
 # --- config end
 
 # buffer = stdout.buffer  # backup
