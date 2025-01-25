@@ -8,9 +8,9 @@ Co-authored-by: NyaOH-Nahida - 新增捕捉退出事件，将退出脚本状态�
 // config start
 const API_URL = 'https://sleepy.wyf9.top/device/set'; // 你的完整 API 地址，以 `/device/set` 结尾
 const SECRET = '绝对猜不出来的密码'; // 你的 secret
-const ID = 'a-device'; // 你的设备 id, 唯一
-const SHOW_NAME = '一个设备'; // 你的设备名称, 将显示在网页上
-const CHECK_INTERVAL = '3000'; // 检查间隔 (毫秒, 1000ms=1s)
+const ID = 'device-2'; // 你的设备 id, 唯一
+const SHOW_NAME = '手机'; // 你的设备名称, 将显示在网页上
+const CHECK_INTERVAL = '2000'; // 检查间隔 (毫秒, 1000ms=1s)
 const SKIPPED_NAMES = ['系统界面', '系统界面组件', '手机管家', '平板管家', 'System UI', 'Security tools'] // 获取到的软件名包含列表中之一时忽略
 // config end
 
@@ -51,9 +51,9 @@ function check_status() {
     // log(`[check] battery: ${battery}%`);
     // 判断设备充电状态
     if (device.isCharging()) {
-        var retname = `[${battery}% +] ${app_name}`;
+        var retname = ` ${app_name} [充电中${battery}%]`;
     } else {
-        var retname = `[${battery}%] ${app_name}`;
+        var retname = ` ${app_name} [放电中${battery}%]`;
     }
     if (!app_name) {
         retname = '';
