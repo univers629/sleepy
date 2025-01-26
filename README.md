@@ -5,13 +5,14 @@
 > 本仓库基于是[@wyf9](https://github.com/wyf9)的[sleepy](https://github.com/wyf9/sleepy)项目的commit[6a277a0](https://github.com/wyf9/sleepy/commit/6a277a0c5b751bdc4ded2efc1c4c92d6995bb569)的保存快照，附加了搭建教程，更新的功能和修复请去查看[@wyf9](https://github.com/wyf9)的[sleepy](https://github.com/wyf9/sleepy)项目
 
 **目录**
-一、[**搭建服务器**](#一搭建服务器以微软azure云服务器为例)
-
-二、[购买域名并解析服务器IP（可选）](#二可选购买域名并解析服务器ip)
-
-三、[搭建网站后端（可选）](#三可选搭建网站后端)
-
-四、[**部署项目**](#四部署sleepy项目)
+> 
+> 一、[**搭建服务器**](#一搭建服务器以微软azure云服务器为例)
+> 
+> 二、[购买域名并解析服务器IP（可选）](#二可选购买域名并解析服务器ip)
+> 
+> 三、[搭建网站后端（可选）](#三可选搭建网站后端)
+> 
+> 四、[**部署项目**](#四部署sleepy项目)
 
 > [!TIP]
 > 如有疑问，可以在[讨论区](https://github.com/univers629/sleepy/issues)查看他人遇到的问题，或[点击](https://github.com/univers629/sleepy/issues/new?template=Blank+issue)提出新的问题。
