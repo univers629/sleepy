@@ -522,7 +522,106 @@
 
 ![部署1](https://github.com/univers629/MacrodownNoteAssets/blob/main/dev/sleepy/asset/images/%E9%83%A8%E7%BD%B21.png?raw=true "部署1")
 
-### (二)添加客户端状态
+### (二)将`sleepy`添加到系统级服务放止后台进程被杀
+#### 1、新建systemd服务
+- 在SSH终端中输入Ctrl+C键结束进程，会看到以下信息
+  ```python
+  [Info] [2025-01-26 15:42:25] - Request: 127.0.0.1 / 5.34.220.34 : /device/set
+  127.0.0.1 - - [26/Jan/2025 15:42:25] "POST /device/set HTTP/1.0" 200 -
+  ^CServer exited, saving data...
+  Bye.
+  ```
+- 输入命令新建sleepy服务
+  ```shell
+  sudo nano /etc/systemd/system/sleepy.service
+  ```
+  在其中填入以下内容
+  ```ini
+  [Unit]
+  Description=Sleepy Flask Application
+  After=network.target
+
+  [Service]
+  User=azureuser
+  Group=azureuser
+  WorkingDirectory=/home/azureuser/sleepy
+  ExecStart=/usr/bin/python3 server.py
+  Restart=always
+  RestartSec=5
+  Environment="FLASK_APP=server.py"
+  Environment="FLASK_RUN_HOST=127.0.0.1"
+  Environment="FLASK_RUN_PORT=9010"
+
+  [Install]
+  WantedBy=multi-user.target
+  ```
+  编辑完成后按`Ctrl+X`后按`Y`确认修改，最后按`回车键`退出
+- 重新加载`systemd`配置运行以下命令，让`systemd`重新加载配置文件
+  ```shell
+  sudo systemctl daemon-reload
+  ```
+#### 2、启用并启动服务
+- 启用服务，使其在开机时自动启动
+  ```shell
+  sudo systemctl enable sleepy.service
+  ```
+- 启动服务
+  ```shell
+  sudo systemctl start sleepy.service
+  ```
+
+#### 3、检查服务是否正常运行
+- 运行命令
+  ```shell
+  sudo systemctl status sleepy.service
+  ```
+  会看到以下类似结果
+  ```shell
+  azureuser@Debian12:~$ sudo systemctl status sleepy.service
+  ● sleepy.service - Sleepy Flask Application
+      Loaded: loaded (/etc/systemd/system/sleepy.service; enabled; preset: enabled)
+      Active: active (running) since Sun 2025-01-26 15:43:16 CST; 26s ago
+    Main PID: 38049 (python3)
+        Tasks: 2 (limit: 1003)
+      Memory: 22.8M
+          CPU: 212ms
+      CGroup: /system.slice/sleepy.service
+              └─38049 /usr/bin/python3 server.py
+
+  1月 26 15:43:17 Debian12 python3[38049]: 127.0.0.1 - - [26/Jan/2025 15:43:17] "POST /device/set HTTP/1.0" 2>
+  1月 26 15:43:19 Debian12 python3[38049]: 127.0.0.1 - - [26/Jan/2025 15:43:19] "POST /device/set HTTP/1.0" 2>
+  1月 26 15:43:22 Debian12 python3[38049]: 127.0.0.1 - - [26/Jan/2025 15:43:22] "POST /device/set HTTP/1.0" 2>
+  1月 26 15:43:25 Debian12 python3[38049]: 127.0.0.1 - - [26/Jan/2025 15:43:25] "POST /device/set HTTP/1.0" 2>
+  1月 26 15:43:27 Debian12 python3[38049]: 127.0.0.1 - - [26/Jan/2025 15:43:27] "POST /device/set HTTP/1.0" 2>
+  1月 26 15:43:29 Debian12 python3[38049]: 127.0.0.1 - - [26/Jan/2025 15:43:29] "POST /device/set HTTP/1.0" 2>
+  1月 26 15:43:32 Debian12 python3[38049]: 127.0.0.1 - - [26/Jan/2025 15:43:32] "POST /device/set HTTP/1.0" 2>
+  1月 26 15:43:34 Debian12 python3[38049]: 127.0.0.1 - - [26/Jan/2025 15:43:34] "POST /device/set HTTP/1.0" 2>
+  1月 26 15:43:37 Debian12 python3[38049]: 127.0.0.1 - - [26/Jan/2025 15:43:37] "POST /device/set HTTP/1.0" 2>
+  1月 26 15:43:39 Debian12 python3[38049]: 127.0.0.1 - - [26/Jan/2025 15:43:39] "POST /device/set HTTP/1.0" 2>
+  ```
+> [!TIP]
+>
+> 以后需要开启或关闭网站服务时用下列命令即可
+> 
+> 关闭服务
+> 
+> ```shell
+> sudo systemctl stop sleepy.service
+> ```
+> 
+> 开启服务
+> 
+> ```shell
+> sudo systemctl start sleepy.service
+> ```
+>
+> 重启服务
+> 
+> ```shell
+> sudo systemctl restart sleepy.service
+> ```
+
+### (三)添加客户端状态
 #### 1、添加windows电脑客户端状态
 - 点击安装[python](https://www.python.org/ftp/python/3.10.6/python-3.10.6-amd64.exe)，全部选择默认选项安装即可
 > [!TIP]
