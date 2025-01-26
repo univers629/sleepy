@@ -45,7 +45,7 @@
 
 ## Configure
 
-https://github.com/univers629/sleepy/blob/e6b77af1e4333ad570983b5bf9ac397cb1d40d7b/client/cmd_console.py#L14-L21
+https://github.com/univers629/sleepy/client/cmd_console.py#L14-L21
 
 ## Using
 
