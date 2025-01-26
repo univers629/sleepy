@@ -2,6 +2,7 @@
 - 成果展示，站点[点击预览](https://smallsinger629.site/)
 ![预览1](https://github.com/univers629/MacrodownNoteAssets/blob/main/dev/sleepy/asset/images/%E9%A2%84%E8%A7%881.png?raw=true "预览1")
 > [!IMPORTANT]
+> 
 > 本仓库基于是[@wyf9](https://github.com/wyf9)的[sleepy](https://github.com/wyf9/sleepy)项目的commit[6a277a0](https://github.com/wyf9/sleepy/commit/6a277a0c5b751bdc4ded2efc1c4c92d6995bb569)的保存快照，附加了搭建教程，更新的功能和修复请去查看[@wyf9](https://github.com/wyf9)的[sleepy](https://github.com/wyf9/sleepy)项目
 
 **目录**
@@ -23,6 +24,7 @@
 ## 一、搭建服务器（以微软Azure云服务器为例）
 [**白嫖**](#一开通azure账号) / [**创建**](#二创建b1s虚拟机) / [**设置**](#三开机设置)
 > [!TIP]
+> 
 > 使用Azure免费服务器需要学生邮箱（*.edu*）或外币信用卡
 
 ### （一）开通Azure账号
@@ -39,15 +41,15 @@
 - [x] 支出保护 - 不会向信用卡收费*
 - [x] 无前期承诺 - 可随时取消
 - [x] 转到即用即付定价，可在超过 30 天或信用额度用尽后继续使用
->普通注册申请免费试用的30天内，需要把订阅升级到即用即付，才能继续免费用一年。但是在升级过程中，有一个Dev Support Plan是默认勾选的，需要去掉，否则会直接从卡中扣费
->普通注册的200美金额度只有1个月有效期
+> 普通注册申请免费试用的30天内，需要把订阅升级到即用即付，才能继续免费用一年。但是在升级过程中，有一个Dev Support Plan是默认勾选的，需要去掉，否则会直接从卡中扣费
+> 普通注册的200美金额度只有1个月有效期
 
->[**余额、资费查询**](https://www.microsoftazuresponsorships.com/Balance)(可查看账单或知晓是否因错误设置而造成收费)
+> [**余额、资费查询**](https://www.microsoftazuresponsorships.com/Balance)(可查看账单或知晓是否因错误设置而造成收费)
 
 ### （二）创建B1s虚拟机
 
->Azure提供的免费机型为B1s，可分别开一台windows和一台Linux。
->两台虚拟机服务器每月各自有750小时的免费使用时长，每月共用15GB流量。
+> Azure提供的免费机型为B1s，可分别开一台windows和一台Linux。
+> 两台虚拟机服务器每月各自有750小时的免费使用时长，每月共用15GB流量。
 
 #### 1、开通Azure账户后，自动跳转到[Azure门户首页](https://portal.azure.com/#home)，点击创建资源，跳转后创建虚拟机。
 ![创建1](https://github.com/univers629/MacrodownNoteAssets/blob/main/dev/sleepy/asset/images/%E5%88%9B%E5%BB%BA%E8%B5%84%E6%BA%901.png?raw=true "创建资源1") ![创建2](https://github.com/univers629/MacrodownNoteAssets/blob/main/dev/sleepy/asset/images/%E5%88%9B%E5%BB%BA%E8%B5%84%E6%BA%902.png?raw=true "创建资源2")
@@ -57,39 +59,57 @@
 ![创建3](https://github.com/univers629/MacrodownNoteAssets/blob/main/dev/sleepy/asset/images/%E5%88%9B%E5%BB%BA%E8%B5%84%E6%BA%903.png?raw=true "创建资源3")
 
 > [!TIP]
+> 
 > 资源组：可以新建一个用户名为资源组
+> 
 > 虚拟机名称：随意
+> 
 > 区域：建议韩国中部，地理距离近且后续配置动态IP时不用删除再新建网络组
-> 映像：可选择“查看所有映像”，然后搜索想要的映像，这里我选择archlinux
+> 
+> 映像：可选择“查看所有映像”，然后搜索想要的映像，这里我选择Debian12
+> 
 > VM体系结构：x64
+> 
 > 使用Azure现成虚拟机折扣运行：保持默认不勾选
 
 > [!IMPORTANT]
+> 
 > 可用性选项：选择无需基础结构冗余（否则无法配置动态IP）
+> 
 > 安全类型：如果选择的系统映像结尾为Gen2则可选择“受信任启动虚拟机”，为Gen1则只能选择“标准”
 
 ![创建4](https://github.com/univers629/MacrodownNoteAssets/blob/main/dev/sleepy/asset/images/%E5%88%9B%E5%BB%BA%E8%B5%84%E6%BA%904.png?raw=true "创建资源4")
 
 > [!TIP]
+> 
 > 启用休眠：保持默认不勾选
+> 
 > 身份验证类型：SSH公钥
+> 
 > 用户名：保持默认即可
+> 
 > SHH公钥源：保持默认生成新密钥对
+> 
 > SHH密钥类型：选择更短的Ed25519格式
+> 
 > 密钥对名称：保持默认或自己设置（之后下载的密钥文件就是这个名称）
+> 
 > 入站端口规则：保持默认
 
-> [!IMPORTANT] 
->大小：必须选择“B1s(有资格免费试用服务)”，否则会收费！！！可以进入“查看所有大小里搜索选择”
+> [!IMPORTANT]
+> 
+> 大小：必须选择“B1s(有资格免费试用服务)”，否则会收费！！！可以进入“查看所有大小里搜索选择”
 
 (2).磁盘
 
 ![创建5](https://github.com/univers629/MacrodownNoteAssets/blob/main/dev/sleepy/asset/images/%E5%88%9B%E5%BB%BA%E8%B5%84%E6%BA%905.png?raw=true "创建资源5")
 
 > [!TIP]
+> 
 > 全部保持默认，只需要设置磁盘大小
 
-> [!IMPORTANT] 
+> [!IMPORTANT]
+> 
 > OS磁盘大小：必须选择“64GiB(P6，符合免费层条件)”，只有这个选项是免费的
 
 (3).网络
@@ -97,9 +117,11 @@
 ![创建6](https://github.com/univers629/MacrodownNoteAssets/blob/main/dev/sleepy/asset/images/%E5%88%9B%E5%BB%BA%E8%B5%84%E6%BA%906.png?raw=true "创建资源6")
 
 > [!TIP]
+> 
 > 全部保持默认，只需要设置公共IP
 
-> [!IMPORTANT] 
+> [!IMPORTANT]
+> 
 > 点击新建公共IP，并按如图设置为动态IP并确定，静态IP会收取费用！！！
 
 (4).管理、监视、高级、标记、查看+创建
@@ -107,8 +129,11 @@
 ![创建7](https://github.com/univers629/MacrodownNoteAssets/blob/main/dev/sleepy/asset/images/%E5%88%9B%E5%BB%BA%E8%B5%84%E6%BA%907.png?raw=true "创建资源7")
 
 > [!TIP]
+> 
 > 全部保持默认，点击下一步，直到显示验证已通过，点击下方创建即可获得一台搭载Debian12的虚拟机云服务器
+> 
 > 创建时会弹出下载SSH密钥的弹窗，点击下载即可
+> 
 > 等待几分钟，虚拟机服务器就创建完毕了
 
 ### （三）开机设置
@@ -142,8 +167,11 @@
 
 
 > [!TIP]
+> 
 > Windterm的30分钟自动锁定屏幕功能可能导致密码错误软件需要重新打开
+> 
 > 可以进入软件目录的`/global`下，右键用记事本打开`wind.config`文件
+> 
 > 查找并修改`"application.lockScreenTimeout": 30`将`30`改为`0`并保存即可关闭自动锁定屏幕
 
 #### 3、（可选）配置Debian系统的中文环境
@@ -173,7 +201,9 @@
 ![SSH12](https://github.com/univers629/MacrodownNoteAssets/blob/main/dev/sleepy/asset/images/SSH12.png?raw=true "SSH12")
 
 > [!TIP]
+> 
 > 检测方法：我们可以关闭WindTerm并重新打开，并输入`sudo apt update`运行，就可以看到输出了中文提示
+> 
 > ![SSH13](https://github.com/univers629/MacrodownNoteAssets/blob/main/dev/sleepy/asset/images/SSH13.png?raw=true "SSH13")
 
 - 将系统时区调整为北京时间
@@ -200,7 +230,8 @@
 
 ## 二、（可选）购买域名并解析服务器IP
 
-> [!IMPORTANT] 
+> [!IMPORTANT]
+> 
 > 不绑定域名的话只能通过IP地址访问网站，且在大多数浏览器上会提示不安全，需要选择`继续访问`之类的选项。
 
 ### （一）购买域名
@@ -241,11 +272,14 @@
 ![域名10](https://github.com/univers629/MacrodownNoteAssets/blob/main/dev/sleepy/asset/images/%E5%9F%9F%E5%90%8D10.png?raw=true "域名10")
 
 > [!TIP]
+> 
 > 主机记录即域名前缀，常用如下：
+> 
 > 1.www：解析后域名为www.baidubceyun.cn
+> 
 > 2.@：直接解析主域名baidubceyun.cn
+> 
 > 3.*：泛解析，匹配其他所有域名baidubceyun.cn
->
 
 
 > CNAME解析可以记录服务器的动态IP，不需要服务器每次重启时都来域名解析这里修改IP地址
@@ -269,6 +303,7 @@
 - 最终开放的端口：
 ![后端6](https://github.com/univers629/MacrodownNoteAssets/blob/main/dev/sleepy/asset/images/%E5%90%8E%E7%AB%AF6.png?raw=true "后端6")
 > [!TIP]
+> 
 > 可以自定义开放端口，`80`端口和`443`端口是`http`或`https`所协议必须的，`9010`端口是`sleepy`项目默认使用的端口，可选择是否开启
 
 ### (二)Nginx后端搭建
@@ -287,7 +322,9 @@
 - 示例
 ![后端7](https://github.com/univers629/MacrodownNoteAssets/blob/main/dev/sleepy/asset/images/%E5%90%8E%E7%AB%AF7.png?raw=true "后端7")
 > [!TIP]
+> 
 > 测试：现在，在浏览器的新标签页地址栏输入你的服务器的`公共IP地址`，即可看到nginx的欢迎页！！！
+> 
 > ![后端8](https://github.com/univers629/MacrodownNoteAssets/blob/main/dev/sleepy/asset/images/%E5%90%8E%E7%AB%AF8.png?raw=true "后端8")
 
 ### (三)配置网站安全证书（使用`certbot`项目）
@@ -302,7 +339,9 @@
   sudo certbot --nginx -d 你的域名地址
   ```
 > [!TIP]
+> 
 > 如果有多个域名，可以继续添加`-d`参数来添加。
+> 
 > 这里的域名需要都在[域名管理页](https://console.bce.baidu.com/bcd/#/bcd/manage/list)里配置了解析，否则获取证书会失败，需要重新运行命令获取。
 
 - 以下是运行的示例和注释：
@@ -349,9 +388,13 @@
   azureuser@Debian12:~$ 
   ```
 > [!TIP]
+> 
 > 证书安装完成后，在浏览器新建标签页，再地址栏中输入你的域名
+> 
 > 你就可以看到网站已经可以安全访问，显示`连接安全`，并且`此网站具有由受信任的机构颁发的有效证书`
+> 
 > ![后端9](https://github.com/univers629/MacrodownNoteAssets/blob/main/dev/sleepy/asset/images/%E5%90%8E%E7%AB%AF9.png?raw=true "后端9")
+> 
 > ![后端10](https://github.com/univers629/MacrodownNoteAssets/blob/main/dev/sleepy/asset/images/%E5%90%8E%E7%AB%AF10.png?raw=true "后端10")
 
 #### 2、站点配置
@@ -518,6 +561,7 @@
   ```
 - 此时，在浏览器的新标签页地址栏输入你的域名地址，就可以看到网站页面已启动
 > [!IMPORTANT]
+> 
 > 没有购买域名和部署网站后端的，需要点击跳转到[开启防火墙端口教程](#一开启防火墙端口)，并开启9010端口，在浏览器的新标签页地址栏输入`你的服务器公共IP地址:9010`来打开网站，类似于`192.168.1.1:9010`这样
 
 ![部署1](https://github.com/univers629/MacrodownNoteAssets/blob/main/dev/sleepy/asset/images/%E9%83%A8%E7%BD%B21.png?raw=true "部署1")
@@ -625,7 +669,9 @@
 #### 1、添加windows电脑客户端状态
 - 点击安装[python](https://www.python.org/ftp/python/3.10.6/python-3.10.6-amd64.exe)，全部选择默认选项安装即可
 > [!TIP]
+> 
 > 在安装时需要勾选这个选项
+> 
 > ![部署2](https://github.com/univers629/MacrodownNoteAssets/blob/main/dev/sleepy/asset/images/%E9%83%A8%E7%BD%B22.png?raw=true "部署2")
 - 安装`pywin32`，`requests`依赖，按`win`+`R`键打开运行窗口，输入`cmd`后按`回车键`打开命令行工具，一次输入下面命令并按`回车键`确认
   ```shell
@@ -639,6 +685,7 @@
 - 右键点击刚才下载的客户端程序，右键用记事本打开，修改里面的基础配置
 ![部署4](https://github.com/univers629/MacrodownNoteAssets/blob/main/dev/sleepy/asset/images/%E9%83%A8%E7%BD%B24.png?raw=true "部署4")
 > [!TIP]
+> 
 > 菜单里没有记事本的点击`选择其他应用`找到记事本打开，翻到下面这一段按照说明更改自己的配置
   ```python
   # --- config start
@@ -662,4 +709,7 @@
 ![部署7](https://github.com/univers629/MacrodownNoteAssets/blob/main/dev/sleepy/asset/images/%E9%83%A8%E7%BD%B27.jpg?raw=true "部署7")![部署8](https://github.com/univers629/MacrodownNoteAssets/blob/main/dev/sleepy/asset/images/%E9%83%A8%E7%BD%B28.jpg?raw=true "部署8")![部署9](https://github.com/univers629/MacrodownNoteAssets/blob/main/dev/sleepy/asset/images/%E9%83%A8%E7%BD%B29.jpg?raw=true "部署9")
 ![部署10](https://github.com/univers629/MacrodownNoteAssets/blob/main/dev/sleepy/asset/images/%E9%83%A8%E7%BD%B210.png?raw=true "部署10")
 > [!TIP]
+> 
 > 可以用同样的方法为平板电脑等设备添加客户端状态，注意不要使用一样的ID导致冲突。
+
+## 本教程到此结束，修改时间2025年1月26日
