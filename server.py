@@ -219,7 +219,26 @@ def set_path(secret, status):
 
 
 # --- Device API
+def convert_device_app_name(app_name):
+    import re
 
+    match = re.match(r'^(.*)[\[［](打开|关闭)(\d+)%[\]］]$', app_name)
+
+    if not match:
+        return app_name
+
+    app = match.group(1)
+    power = match.group(2)
+    battery = match.group(3)
+
+    if power == '打开':
+        power_status = '充电中'
+    elif power == '关闭':
+        power_status = '放电中'
+    else:
+        power_status = power
+
+    return f'{app}[{power_status}{battery}%]'
 
 @app.route('/device/set', methods=['GET', 'POST'])
 def device_set():
@@ -233,6 +252,7 @@ def device_set():
             device_show_name = escape(request.args.get('show_name'))
             device_using = u.tobool(escape(request.args.get('using')), throw=True)
             app_name = escape(request.args.get('app_name'))
+            app_name = convert_device_app_name(app_name)
         except:
             return u.reterr(
                 code='bad request',
@@ -261,6 +281,7 @@ def device_set():
             device_show_name = req['show_name']
             device_using = u.tobool(req['using'], throw=True)
             app_name = req['app_name']
+            app_name = convert_device_app_name(app_name)
         except:
             return u.reterr(
                 code='bad request',
