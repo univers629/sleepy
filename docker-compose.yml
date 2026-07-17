@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  sleepy:
+    build: .
+    container_name: sleepy
+    ports:
+      - "9010:9010"
+    volumes:
+      - ./config.json:/app/config.json
+    restart: always
