@@ -8,4 +8,5 @@ services:
       - "9010:9010"
     volumes:
       - ./config.json:/app/config.json
+      - ./static/favicon.ico:/app/static/favicon.ico   # 只映射这一个文件
     restart: always
