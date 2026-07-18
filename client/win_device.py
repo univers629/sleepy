@@ -1,145 +1,157 @@
 # coding: utf-8
-'''
-win_device.py
-在 Windows 上获取窗口名称
-by: @wyf9
-依赖: pywin32, requests
-'''
-from win32gui import GetWindowText, GetForegroundWindow  # type: ignore
-from requests import post
-from datetime import datetime
-from time import sleep
+"""Windows 前台窗口状态上报脚本（稳健版）。
+
+依赖：pywin32、requests
+    pip install pywin32 requests
+"""
+
+from __future__ import annotations
+
+import atexit
+import signal
 import sys
-import io
+import threading
+from datetime import datetime
+from time import monotonic
 
-# --- config start
-# 服务地址, 末尾同样不带 /
-SERVER = 'http://localhost:9010'
-# 密钥
-SECRET = 'wyf9test'
-# 设备标识符，唯一 (它也会被包含在 api 返回中, 不要包含敏感数据)
-DEVICE_ID = 'device-1'
-# 前台显示名称
-DEVICE_SHOW_NAME = '电脑'
-# 检查间隔，以秒为单位
-CHECK_INTERVAL = 2
-# 是否忽略重复请求，即窗口未改变时不发送请求
+import requests
+from win32gui import GetForegroundWindow, GetWindowText  # type: ignore
+
+# --- config start -----------------------------------------------------------
+# 可填服务根地址，或完整的 /device/set 地址。
+SERVER = "https://alive.smallsinger.xyz"
+SECRET = "123456"
+DEVICE_ID = "device-1"
+DEVICE_SHOW_NAME = "电脑"
+
+# 轮询间隔；网络失败时下一个轮询会自动重试。
+CHECK_INTERVAL = 3
+# 即使窗口没有变化，也每隔此秒数发送一次心跳，避免服务端状态因某次丢包过期。
+HEARTBEAT_INTERVAL = 60
+# (连接超时, 读取超时)。过长会让脚本看似“卡住”。
+REQUEST_TIMEOUT = (3, 8)
+
 BYPASS_SAME_REQUEST = True
-# 控制台输出所用编码，避免编码出错，可选 utf-8 或 gb18030
-ENCODING = 'gb18030'
-# 当窗口标题为其中任意一项时将不更新
-SKIPPED_NAMES = ['', '系统托盘溢出窗口。', '新通知', '任务切换', '快速设置', '通知中心', '搜索', 'Flow.Launcher']
-# 当窗口标题为其中任意一项时视为未在使用
-NOT_USING_NAMES = ['我们喜欢这张图片，因此我们将它与你共享。']
-# 是否反转窗口标题，以此让应用名显示在最前 (以 ` - ` 分隔)
+SKIPPED_NAMES = {
+    "", "系统托盘溢出窗口。", "新通知", "任务切换", "快速设置", "通知中心", "搜索", "Flow.Launcher",
+}
+NOT_USING_NAMES = {"我们喜欢这张图片，因此我们将它与你共享。"}
 REVERSE_APP_NAME = True
-# --- config end
+# --- config end -------------------------------------------------------------
 
-# buffer = stdout.buffer  # backup
-# stdout = TextIOWrapper(stdout.buffer, encoding=ENCODING)  # https://stackoverflow.com/a/3218048/28091753
-sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
-_print_ = print
+URL = SERVER.rstrip("/")
+if not URL.endswith("/device/set"):
+    URL += "/device/set"
+
+SESSION = requests.Session()
+STOP_EVENT = threading.Event()
+LAST_SUCCESSFUL_PAYLOAD: tuple[bool, str] | None = None
+LAST_SUCCESSFUL_AT = 0.0
+OFFLINE_REPORTED = False
 
 
-def print(msg: str, **kwargs):
-    '''
-    修改后的 `print()` 函数，解决不刷新日志的问题
-    原: `_print_()`
-    '''
-    msg = str(msg).replace('\u200b', '')
+def log(message: str) -> None:
     try:
-        _print_(f'[{datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] {msg}', flush=True, **kwargs)
-    except Exception as e:
-        _print_(f'[{datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] Log Error: {e}', flush=True)
+        print(f"[{datetime.now():%Y-%m-%d %H:%M:%S}] {message}", flush=True)
+    except Exception:
+        pass
 
 
-def reverse_app_name(name: str) -> str:
-    '''
-    反转应用名称 (将末尾的应用名提前)
-    如 Before: win_device.py - dev - Visual Studio Code
-    After: Visual Studio Code - dev - win_device.py
-    '''
-    lst = name.split(' - ')
-    print(lst)
-    new = []
-    for i in lst:
-        print(i)
-        new = [i] + new
-    return ' - '.join(new)
+def display_name(title: str) -> str:
+    if not REVERSE_APP_NAME:
+        return title
+    # 例如："文件 - VS Code" -> "VS Code - 文件"。
+    return " - ".join(reversed(title.split(" - ")))
 
 
-Url = f'{SERVER}/device/set'
-last_window = ''
+def foreground_title() -> str | None:
+    """返回标题；返回 None 表示本轮读取 Windows API 失败，应在下轮重试。"""
+    try:
+        hwnd = GetForegroundWindow()
+        return GetWindowText(hwnd) if hwnd else ""
+    except Exception as error:
+        log(f"读取前台窗口失败，将重试：{error}")
+        return None
 
 
-def do_update():
-    global last_window
-    window = GetWindowText(GetForegroundWindow())  # type: ignore
-    print(f'--- Window: `{window}`')
+def post(using: bool, app_name: str) -> bool:
+    """仅在服务端确认 2xx 后才返回成功。"""
+    payload = {
+        "secret": SECRET,
+        "id": DEVICE_ID,
+        "show_name": DEVICE_SHOW_NAME,
+        "using": using,
+        "app_name": app_name if using else "",
+    }
+    try:
+        response = SESSION.post(URL, json=payload, timeout=REQUEST_TIMEOUT)
+        response.raise_for_status()
+        try:
+            result = response.json()
+        except ValueError:
+            result = response.text[:200] or "<empty response>"
+        log(f"POST {response.status_code}: {result}")
+        return True
+    except requests.RequestException as error:
+        # 不更新 LAST_SUCCESSFUL_*，因此下一轮会继续尝试，不会“卡在未上报”。
+        log(f"上报失败，将在下次轮询重试：{error}")
+        return False
 
-    # 检测重复名称
-    if (BYPASS_SAME_REQUEST and window == last_window):
-        print('window not change, bypass')
+
+def update() -> None:
+    global LAST_SUCCESSFUL_PAYLOAD, LAST_SUCCESSFUL_AT
+
+    title = foreground_title()
+    if title is None:
+        return
+    if title in SKIPPED_NAMES:
         return
 
-    # 检查跳过名称
-    for i in SKIPPED_NAMES:
-        if i == window:
-            print(f'* skipped: `{i}`')
-            return
+    using = title not in NOT_USING_NAMES
+    app_name = display_name(title) if using else ""
+    state = (using, app_name)
+    now = monotonic()
+    unchanged = state == LAST_SUCCESSFUL_PAYLOAD
+    heartbeat_due = now - LAST_SUCCESSFUL_AT >= HEARTBEAT_INTERVAL
+    if BYPASS_SAME_REQUEST and unchanged and not heartbeat_due:
+        return
 
-    # 判断是否在使用
-    using = True
-    for i in NOT_USING_NAMES:
-        if i == window:
-            print(f'* not using: `{i}`')
-            using = False
-
-    # 反转名称
-    if REVERSE_APP_NAME:
-        window = reverse_app_name(window)
-        print(f'Reversed: `{i}`')
-
-    # POST to api
-    print(f'POST {Url}')
-    try:
-        resp = post(url=Url, json={
-            'secret': SECRET,
-            'id': DEVICE_ID,
-            'show_name': DEVICE_SHOW_NAME,
-            'using': using,
-            'app_name': window
-        }, headers={
-            'Content-Type': 'application/json'
-        })
-        print(f'Response: {resp.status_code} - {resp.json()}')
-    except Exception as e:
-        print(f'Error: {e}')
-    last_window = window
+    log(f"窗口：{title!r}；上报：using={using}, app_name={app_name!r}")
+    if post(using, app_name):
+        LAST_SUCCESSFUL_PAYLOAD = state
+        LAST_SUCCESSFUL_AT = now
 
 
-def main():
-    while True:
-        do_update()
-        sleep(CHECK_INTERVAL)
+def report_offline() -> None:
+    """正常退出时尽力发送离线状态；最多阻塞 REQUEST_TIMEOUT 的读取时间。"""
+    global OFFLINE_REPORTED
+    if OFFLINE_REPORTED:
+        return
+    OFFLINE_REPORTED = True
+    log("正在上报离线状态")
+    post(False, "")
 
 
-if __name__ == '__main__':
+def request_stop(*_args: object) -> None:
+    STOP_EVENT.set()
+
+
+def main() -> None:
+    log(f"启动，目标：{URL}")
+    while not STOP_EVENT.is_set():
+        try:
+            update()
+        except Exception as error:
+            # 防止任何未预料的单次异常结束整个常驻脚本。
+            log(f"本轮发生未预料异常，将继续运行：{error}")
+        STOP_EVENT.wait(CHECK_INTERVAL)
+
+
+if __name__ == "__main__":
+    atexit.register(report_offline)
+    signal.signal(signal.SIGINT, request_stop)
+    signal.signal(signal.SIGTERM, request_stop)
     try:
         main()
-    except KeyboardInterrupt as e:
-        # 如果中断则发送未在使用
-        print(f'Interrupt: {e}')
-        try:
-            resp = post(url=Url, json={
-                'secret': SECRET,
-                'id': DEVICE_ID,
-                'show_name': DEVICE_SHOW_NAME,
-                'using': False,
-                'app_name': f'{e}'
-            }, headers={
-                'Content-Type': 'application/json'
-            })
-            print(f'Response: {resp.status_code} - {resp.json()}')
-        except Exception as e:
-            print(f'Exception: {e}')
+    finally:
+        report_offline()
