@@ -19,8 +19,8 @@ from win32gui import GetForegroundWindow, GetWindowText  # type: ignore
 
 # --- config start -----------------------------------------------------------
 # 可填服务根地址，或完整的 /device/set 地址。
-SERVER = "https://alive.smallsinger.xyz"
-SECRET = "123456"
+SERVER = "https://你的域名地址"
+SECRET = "填写服务端设置的密码"
 DEVICE_ID = "device-1"
 DEVICE_SHOW_NAME = "电脑"
 
