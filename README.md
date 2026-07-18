@@ -586,9 +586,9 @@
   After=network.target
 
   [Service]
-  User=azureuser
-  Group=azureuser
-  WorkingDirectory=/home/azureuser/sleepy
+  User=你的用户名
+  Group=你的用户名
+  WorkingDirectory=/你的项目上级路径/sleepy
   ExecStart=/usr/bin/python3 server.py
   Restart=always
   RestartSec=5
