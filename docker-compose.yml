@@ -5,7 +5,7 @@ services:
     build: .
     container_name: sleepy
     ports:
-      - "9010:9010"
+      - "127.0.0.1:9010:9010"
     volumes:
       - ./config.json:/app/config.json
       - ./static/favicon.ico:/app/static/favicon.ico   # 只映射这一个文件
